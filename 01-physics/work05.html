@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  this.load.image('ground2', 'assets/images/ground2.png');
+  // プレイヤースプライトの読み込み
+  this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+  
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 物理エンジン対応のプレイヤスプライト読み込み
+  this.player = this.physics.add.sprite(100, 535, 'player');
+  // プレイヤーの表示サイズ変更
+  this.player.setDisplaySize(50,50);
+  // プレイヤーの最初のフレームを設定
+  this.player.setFrame(7);
+  // プレイヤーがゲーム空間と衝突
+  this.player.setCollideWorldBounds(true);
+  
+  // プレイヤーと地面の衝突
+  this.physics.add.collider(this.player, this.ground);
+  
+  // 左向きのアニメーション
+  this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 3, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  // 右向きのアニメーション
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+  });
+};
+
+mainScene.update = function() {
+  var runSpeed = 200;
+  var jumpPower = 350;
+  
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.right.isDown) {
+    // 右向きのアニメーション
+    this.player.anims.play('right', true);
+    // 右に移動
+    this.player.setVelocityX(runSpeed);
+  } else if(cursors.left.isDown) {
+    // 左向きのアニメーション
+    this.player.anims.play('left', true);
+    // 左に移動
+    this.player.setVelocityX(-runSpeed);
+  } else {
+    // アニメーション停止
+    this.player.anims.stop();
+    // 移動停止
+    this.player.setVelocityX(0);
+  }
+  // スペースキーをクリックしたら
+  if(cursors.space.isDown && this.player.body.onFloor()) {
+    // ジャンプ
+    this.player.setVelocityY(-jumpPower);
+  }
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

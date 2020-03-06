@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // ボール画像の読み込み
+  this.load.image('ball', 'assets/images/ball.png');
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+  
+  // ボールを物理エンジン対応で表示
+  this.ball = this.physics.add.image(400, 540, 'ball');
+  // ボールのサイズ変更
+  this.ball.setDisplaySize(40, 40);
+  // ボールに反発力を設定
+  this.ball.setBounce(0.5);
+  // ボールがゲーム空間の領域と衝突する
+  this.ball.setCollideWorldBounds(true);
+
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  // ボールと地面を衝突させる
+  this.physics.add.collider(this.ball, this.ground);
+};
+
+mainScene.update = function() {
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.space.isDown) {
+    this.ball.setVelocityX(100);
+    this.ball.setVelocityY(-400);
+  }
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

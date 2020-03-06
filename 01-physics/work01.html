@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // ボール画像の読み込み
+  this.load.image('ball', 'assets/images/ball.png');
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+  
+  // ボールを物理エンジン対応で表示
+  this.ball = this.physics.add.image(400, 0, 'ball');
+  // ボールのサイズ変更
+  this.ball.setDisplaySize(40, 40);
+  // ボールに反発力を設定
+  this.ball.setBounce(0.5);
+
+  // 地面グループの作成　物理エンジン対象の固定オブジェクト用グループ
+  this.ground = this.physics.add.staticGroup();
+  // グループに地面を追加
+  this.ground.create(360,500, 'ground');
+  this.ground.create(400,500, 'ground');
+  this.ground.create(440,500, 'ground');
+  
+  // ボールと地面グループを衝突させる
+  this.physics.add.collider(this.ball, this.ground);
+};
+
+mainScene.update = function() {
+  
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>
