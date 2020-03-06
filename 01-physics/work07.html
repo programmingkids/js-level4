@@ -57,28 +57,12 @@ mainScene.create = function() {
       repeat: -1
   });
   
-  // 作る敵の最大値
-  this.maxEnemy = 3;
-  // 敵の数
-  this.enemyCount = 0;
   
-  // 敵グループの作成
-  this.enemyGroup = this.physics.add.group();
-  // 敵グループと地面の衝突
-  this.physics.add.collider(this.enemyGroup, this.ground);
-  // 敵グループとプレイヤーの衝突したときの処理
-  this.physics.add.collider(this.player, this.enemyGroup, this.hitEnemy, null, this);
-
-  // 最初の敵を作る
-  this.createEnemy();
   
-  // 3秒ごとに敵を作成する
-  this.timeEvent = this.time.addEvent({
-    delay: 3000,
-    callback: this.createEnemy,
-    loop: true,
-    callbackScope: this
-  });
+  
+  
+  
+  
   
   // ゲームオーバーフラグ
   this.isGameOver = false;
@@ -129,23 +113,9 @@ mainScene.hitEnemy = function (player, enemy) {
 };
 
 mainScene.createEnemy = function() {
-  if(this.enemyCount >= this.maxEnemy) {
-    // maxEnemy以上は作らない
-    return;
-  }
-  // 敵の作成
-  var enemy = this.enemyGroup.create(750, 400, 'enemy01');
-  // 敵のサイズ変更
-  enemy.setDisplaySize(50,50);
-  // 敵はゲーム領域と衝突
-  enemy.setCollideWorldBounds(true);
-  // 敵に反発力を設定する
-  enemy.setBounce(0.8);
-  // 敵にX方向のランダムな力を加える
-  var speed = Phaser.Math.RND.between(-100, -50);
-  enemy.setVelocityX(speed);
-  // 作成した敵の数をカウントアップする
-  this.enemyCount++;
+  
+  
+  
 };
 
 var config = {

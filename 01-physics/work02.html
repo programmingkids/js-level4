@@ -28,23 +28,19 @@ mainScene.create = function() {
   this.ball.setDisplaySize(40, 40);
   // ボールに反発力を設定
   this.ball.setBounce(0.5);
-  // ボールがゲーム空間の領域と衝突する
-  this.ball.setCollideWorldBounds(true);
-
-  // 地面を作成する。タイルスプライトで最下部に敷き詰める
-  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
-  // 地面のタイルスプライトを物理エンジン対象にする
-  this.physics.add.existing(this.ground, true);
-  // ボールと地面を衝突させる
-  this.physics.add.collider(this.ball, this.ground);
+  
+  
+  
+  
+  
+  
 };
 
 mainScene.update = function() {
   var cursors = this.input.keyboard.createCursorKeys();
-  if(cursors.space.isDown) {
-    this.ball.setVelocityX(100);
-    this.ball.setVelocityY(-400);
-  }
+  
+  
+  
 };
 
 var config = {

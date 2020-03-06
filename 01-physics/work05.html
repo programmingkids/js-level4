@@ -28,17 +28,14 @@ mainScene.create = function() {
   // 地面のタイルスプライトを物理エンジン対象にする
   this.physics.add.existing(this.ground, true);
   
-  // 物理エンジン対応のプレイヤスプライト読み込み
-  this.player = this.physics.add.sprite(100, 535, 'player');
-  // プレイヤーの表示サイズ変更
-  this.player.setDisplaySize(50,50);
-  // プレイヤーの最初のフレームを設定
-  this.player.setFrame(7);
-  // プレイヤーがゲーム空間と衝突
-  this.player.setCollideWorldBounds(true);
   
-  // プレイヤーと地面の衝突
-  this.physics.add.collider(this.player, this.ground);
+  
+  
+  
+  
+  
+  
+  
   
   // 左向きのアニメーション
   this.anims.create({
@@ -65,22 +62,22 @@ mainScene.update = function() {
     // 右向きのアニメーション
     this.player.anims.play('right', true);
     // 右に移動
-    this.player.setVelocityX(runSpeed);
+    
   } else if(cursors.left.isDown) {
     // 左向きのアニメーション
     this.player.anims.play('left', true);
     // 左に移動
-    this.player.setVelocityX(-runSpeed);
+    
   } else {
     // アニメーション停止
     this.player.anims.stop();
     // 移動停止
-    this.player.setVelocityX(0);
+    
   }
   // スペースキーをクリックしたら
   if(cursors.space.isDown && this.player.body.onFloor()) {
     // ジャンプ
-    this.player.setVelocityY(-jumpPower);
+    
   }
 };
 

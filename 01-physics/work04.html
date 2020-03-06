@@ -39,26 +39,19 @@ mainScene.create = function() {
   // ボールと地面を衝突させる
   this.physics.add.collider(this.ball, this.ground);
   
-  // 壁グループの作成
-  this.kabeGroup = this.physics.add.staticGroup();
+  // ここにプログラムを作成します
   
-  // 壁1の作成
-  var kabe1 = this.kabeGroup.create(650, 300,'ground2');
-  kabe1.setDisplaySize(300,40);
-  kabe1.refreshBody();
   
-  // 壁2の作成
-  var kabe2 = this.kabeGroup.create(520, 240,'ground2');
-  kabe2.setDisplaySize(40,80);
-  kabe2.refreshBody();
   
-  this.physics.add.collider(this.ball, this.kabeGroup);
+  
 };
 
 mainScene.update = function() {
   var cursors = this.input.keyboard.createCursorKeys();
   if(cursors.space.isDown) {
-    this.ball.setVelocity(130, -500);
+    // ここにプログラムを作成します
+    
+    
   }
 };
 

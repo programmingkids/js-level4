@@ -73,30 +73,19 @@ mainScene.create = function() {
     fill: '#ff0000'
   });
   
+  // ここにプログラムを作成します
   // 床2の作成
-  var floor2 = this.floorGroup.create(300, 240,'ground2');
-  floor2.setDisplaySize(600,20);
-  floor2.refreshBody();
+  
+  
   
   // コイングループの作成
-  this.coinGroup = this.physics.add.group();
-  // コイングループと地面の衝突
-  this.physics.add.collider(this.coinGroup, this.ground);
-  // コイングループとプレイヤーの衝突したときの処理
-  this.physics.add.overlap(this.player, this.coinGroup, this.hitCoin, null, this);
-  // コイングループと床グループの衝突
-  this.physics.add.collider(this.coinGroup, this.floorGroup);
   
-  // 最初のコインを作る
-  this.createCoin();
   
+
   // 1秒ごとにコインを作成する
-  this.timeEvent = this.time.addEvent({
-    delay: 1000,
-    callback: this.createCoin,
-    loop: true,
-    callbackScope: this
-  });
+  
+  
+  
 };
 
 mainScene.update = function() {
@@ -128,24 +117,19 @@ mainScene.update = function() {
 };
 
 mainScene.hitCoin = function (player, coin) {
-  coin.destroy();
-  this.score += 10;
-  this.scoreText.setText('スコア: ' + this.score);
+  // ここにプログラムを作成します
+  // プレイヤーとコインが衝突したときの処理
+  
+  
+  
 };
 
 mainScene.createCoin = function() {
+  // ここにプログラムを作成します
   // コインの作成
-  var x = Phaser.Math.RND.between(20, 750);
-  var coin = this.coinGroup.create(x, 10, 'coin');
-  // コインサイズ
-  coin.setDisplaySize(50, 50);
-  // コインに反発力を設定する
-  coin.setBounce(0.8);
-  // コインがゲーム領域と衝突する
-  coin.setCollideWorldBounds(true);
-  // コインに右方向の力を設定
-  var speed = Phaser.Math.RND.between(100, 50);
-  coin.setVelocity(speed);
+  
+  
+  
 };
 
 var config = {

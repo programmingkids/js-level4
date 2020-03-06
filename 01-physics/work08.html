@@ -57,13 +57,11 @@ mainScene.create = function() {
       repeat: -1
   });
   
-  // 床グループ作成
-  this.floorGroup = this.physics.add.staticGroup();
-  var floor = this.floorGroup.create(650, 400,'ground2');
-  floor.setDisplaySize(300,20);
-  floor.refreshBody();
-  // 床グループとプレイヤーの衝突
-  this.physics.add.collider(this.player, this.floorGroup);
+  
+  
+  
+  
+  
   
   // 作る敵の最大値
   this.maxEnemy = 3;
@@ -76,8 +74,8 @@ mainScene.create = function() {
   this.physics.add.collider(this.enemyGroup, this.ground);
   // 敵グループとプレイヤーの衝突したときの処理
   this.physics.add.collider(this.player, this.enemyGroup, this.hitEnemy, null, this);
-  // 敵グループと床グループの衝突
-  this.physics.add.collider(this.enemyGroup, this.floorGroup);
+  
+  
   
   // 最初の敵を作る
   this.createEnemy();
