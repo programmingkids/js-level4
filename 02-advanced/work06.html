@@ -18,7 +18,7 @@ mainScene.preload = function() {
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
   // コイン画像の読み込み
   this.load.image('coin', 'assets/images/coin.png');
-  // スプライトシートの読み込み
+  // タイルのスプライトシートの読み込み
   this.load.spritesheet('tiles','assets/images/tiles.png', {frameWidth: 70, frameHeight: 70});
 };
 
@@ -56,13 +56,22 @@ mainScene.create = function() {
       frameRate: 10,
       repeat: -1
   });
-
+  
+  // スコア
+  this.score = 0;
+    
+  // スコアを文字で表示する
+  this.scoreText = this.add.text(600, 20, 'スコア：' + this.score, {
+    font: '28px Open Sans',
+    fill: '#ff0000'
+  });
+  
   // プレイヤーと衝突するためのタイルグループ
   this.tileGroup = this.physics.add.group();
   // タイルグループとプレイヤーの衝突
   this.physics.add.collider(this.player, this.tileGroup, this.hitTile, null, this);
 
-  // タイル作成
+  // 1枚目のタイルの作成
   var tile1 = this.tileGroup.create(200, 400, "tiles", 3);
   // タイルの表示サイズ変更
   tile1.setDisplaySize(70, 70);
@@ -78,28 +87,19 @@ mainScene.create = function() {
   tile2.body.setAllowGravity(false);
 
   // 3枚目のタイル作成
-  var tile3 = this.tileGroup.create(340, 400, "tiles", 12);
+  var tile3 = this.tileGroup.create(500, 400, "tiles", 12);
   tile3.setDisplaySize(70, 70);
   tile3.setImmovable(true);
   tile3.body.setAllowGravity(false);
 
   // 4枚目のタイル作成
-  var tile4 = this.tileGroup.create(410, 400, "tiles", 14);
+  var tile4 = this.tileGroup.create(570, 400, "tiles", 14);
   tile4.setDisplaySize(70, 70);
   tile4.setImmovable(true);
   tile4.body.setAllowGravity(false);
 
   // コイングループの作成
   this.createCoinGroup();
-
-  // スコア
-  this.score = 0;
-    
-  // スコアを文字で表示する
-  this.scoreText = this.add.text(600, 20, 'スコア：' + this.score, {
-    font: '28px Open Sans',
-    fill: '#ff0000'
-  });
 };
 
 mainScene.update = function() {
@@ -133,7 +133,7 @@ mainScene.update = function() {
 mainScene.createCoinGroup = function() {
   // コイングループ作成
   this.coinGroup = this.physics.add.group();
-  // コイングループと床グループの衝突
+  // コイングループと地面の衝突
   this.physics.add.collider(this.coinGroup, this.ground);
   // コイングループとタイルグループの衝突
   this.physics.add.collider(this.coinGroup, this.tileGroup);
@@ -144,7 +144,7 @@ mainScene.createCoinGroup = function() {
 mainScene.hitTile = function(player, tile) {
   // プレイヤーの上側とタイルの下側が衝突しているなら
   if (player.body.touching.up && tile.body.touching.down) {
-    // コインを作成
+    // コインを作成（引数でプレイヤーと衝突したタイルを渡す）
     this.createCoin(player, tile);
   }
 };
@@ -152,7 +152,7 @@ mainScene.hitTile = function(player, tile) {
 mainScene.createCoin = function(player, tile) {
   // 衝突したタイルの中心のX座標
   var x = tile.body.center.x;
-  // 衝突したタイルの上側に35を加算した位置がY座標
+  // 衝突したタイルの上側に35を減算した位置がY座標
   var y = tile.body.top - 35;
   // 衝突したタイルのX座標とY座標の上側にコインを作成する
   var coin = this.coinGroup.create(x, y, 'coin');
