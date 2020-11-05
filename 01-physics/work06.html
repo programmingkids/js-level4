@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // ボール画像の読み込み
+  this.load.image('ball', 'assets/images/ball.png');
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  // 四角形画像の読み込み
+  this.load.image('square_red', 'assets/images/square_red.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+  
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 四角形画像グループを作成
+  this.createSquareGroup();
+  
+  // 0.5秒ごとに作成する
+  this.timeEvent = this.time.addEvent({
+    delay: 500,
+    callback: this.createSquare,
+    loop: true,
+    callbackScope: this
+  });
+};
+
+mainScene.update = function() {
+
+};
+
+mainScene.createSquareGroup = function() {
+  // 四角形画像グループの作成
+  this.squareGroup = this.physics.add.group();
+  // 四角形画像グループと地面の衝突
+  this.physics.add.collider(this.squareGroup, this.ground);
+};
+
+mainScene.createSquare = function() {
+  // 四角形の作成
+  var square = this.squareGroup.create(400, 40, "square_red");
+  square.setDisplaySize(40,40);
+  square.setBounce(0.5);
+  square.setCollideWorldBounds(true);
+  square.setVelocity(200, 200);
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

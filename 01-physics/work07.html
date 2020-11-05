@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // ボール画像の読み込み
+  this.load.image('ball', 'assets/images/ball.png');
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  // 四角形画像の読み込み
+  this.load.image('square_red', 'assets/images/square_red.png');
+  this.load.image('square_grey', 'assets/images/square_grey.png');
+  this.load.image('square_green', 'assets/images/square_green.png');
+  this.load.image('square_yellow', 'assets/images/square_yellow.png');
+  this.load.image('square_purple', 'assets/images/square_purple.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+  
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 四角形グループを作成
+  this.createSquareGroup();
+  
+  // 0.5秒ごとに作成する
+  this.timeEvent = this.time.addEvent({
+    delay: 500,
+    callback: this.createSquare,
+    loop: true,
+    callbackScope: this
+  });
+};
+
+mainScene.update = function() {
+
+};
+
+mainScene.createSquareGroup = function() {
+  // 四角形グループの作成
+  this.squareGroup = this.physics.add.group();
+  // 四角形グループと地面の衝突
+  this.physics.add.collider(this.squareGroup, this.ground);
+  // 四角形グループ同士の衝突
+  this.physics.add.collider(this.squareGroup, this.squareGroup);
+};
+
+mainScene.createSquare = function() {
+  // 作成する四角形をランダムに選択
+  var square_images = ["square_red", "square_grey","square_green","square_yellow","square_purple"];
+  var random_image = Phaser.Math.RND.pick(square_images);
+  
+  // 作成する四角形のX座標をランダムに選択
+  var random_x = Phaser.Math.RND.between(50, 750);
+  
+  // 四角形を作成（ランダムな画像とランダムなX座標）
+  var square = this.squareGroup.create(random_x, 40, random_image);
+  
+  // 四角形の設定
+  square.setDisplaySize(40,40);
+  square.setBounce(0.5);
+  square.setCollideWorldBounds(true);
+  
+  // 作成する四角形の速度をランダムに選択
+  var square_speeds = [200, 400, -200, -400];
+  var random_speed = Phaser.Math.RND.pick(square_speeds);
+  square.setVelocity(random_speed, 200);
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>
