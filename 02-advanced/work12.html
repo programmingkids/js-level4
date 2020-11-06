@@ -16,8 +16,10 @@ mainScene.preload = function() {
   this.load.image('ground', 'assets/images/ground.png');
   // プレイヤースプライトの読み込み
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
-  // ボール画像の読み込み
-  this.load.image('ball', 'assets/images/ball.png');
+  // ボックス画像の読み込み
+  this.load.image('box', 'assets/images/boxCrate.png');
+  // 移動フロア画像の読み込み
+  this.load.image('floorMove', 'assets/images/floorMove.png');
 };
 
 mainScene.create = function() {
@@ -55,16 +57,12 @@ mainScene.create = function() {
       repeat: -1
   });
   
-  // プレイヤーが最初に向いている方向を変数に代入
-  this.player.direction = "right";
-  // ボールグループを作成
-  this.createBallGroup();
-  
-  // スペースキーでボール発射
-  this.input.keyboard.on('keydown-SPACE', function(event) {
-    // ボールを作成
-    this.createBall();
-  }, this);
+  // ボックスグループの作成
+  this.createBoxGroup();
+  // 移動フロアの移動量
+  this.dx = 2;
+  // 移動フロアの作成
+  this.createFloorMove();
 };
 
 mainScene.update = function() {
@@ -97,35 +95,63 @@ mainScene.update = function() {
     // ジャンプ
     this.player.setVelocityY(-jumpPower);
   }
+  
+  // 左に到達したら
+  if( this.floorMove.x < 285 ) {
+    this.dx = -this.dx;
+  }
+  // 右に到達したら
+  if( this.floorMove.x > 515) {
+    this.dx = -this.dx;
+  }
+  // プレイヤーの下側と移動フロアの上側に接触があるなら
+  if( this.player.body.touching.down &&
+      this.floorMove.body.touching.up) {
+    // 移動フロアの左右移動
+    this.floorMove.x += this.dx;
+  }
 };
 
-mainScene.createBallGroup = function() {
-  // ボールグループ作成
-  this.ballGroup = this.physics.add.group();
-  // ボールグループと地面の衝突
-  this.physics.add.collider(this.ballGroup, this.ground);
+mainScene.createBoxGroup = function() {
+  // ボックスグループの作成
+  this.boxGroup = this.physics.add.staticGroup();
+  // プレイヤーとボックスグループの衝突
+  this.physics.add.collider(this.player, this.boxGroup);
+  // ボックスの作成
+  this.createBox();
 };
 
-mainScene.createBall = function() {
-  // プレイヤーのX座標
-  var x = this.player.body.center.x;
-  // プレイヤーのY座標
-  var y = this.player.body.center.y;
+mainScene.createBox = function() {
+  // ボックス1の作成
+  var box1 = this.boxGroup.create(200, 400, "box");
+  box1.setDisplaySize(70, 70);
+  box1.refreshBody();
   
-  // ボール作成
-  var ball = this.ballGroup.create(x, y, 'ball');
-  // ボールに各種設定
-  ball.setDisplaySize(20, 20);
-  ball.body.setAllowGravity(false);
+  // ボックス2の作成
+  var box2 = this.boxGroup.create(600, 400, "box");
+  box2.setDisplaySize(70, 70);
+  box2.refreshBody();
+};
+
+mainScene.createFloorMove = function() {
+  // 移動フロアの作成
+  this.floorMove = this.physics.add.image(285, 375, "floorMove");
+  // プレイヤーと移動フロアの衝突
+  this.physics.add.collider(this.player, this.floorMove, this.hitFloor, null, this);
+  // 移動フロアのボックスグループの衝突
+  this.physics.add.collider(this.floorMove, this.boxGroup);
   
-  // ボールの速度設定
-  var speed = 700;
-  if(this.player.direction == "right") {
-    // プレイヤーが右向きなら右方向に加速  
-    ball.setVelocityX(speed);
-  } else {
-    // プレイヤーが左向きなら左方向に加速  
-    ball.setVelocityX(-speed);
+  // 移動フロアの各種設定
+  this.floorMove.setDisplaySize(100, 20);
+  this.floorMove.setImmovable(true);
+  this.floorMove.body.setAllowGravity(false);
+};
+
+mainScene.hitFloor = function(player, floorMove) {
+  // プレイヤーの下側と移動フロアの上側が接している
+  if(this.player.body.touching.down && this.floorMove.body.touching.up) {
+    // 移動フロアの移動量をプレイヤーのX座標に加算
+    this.player.x += this.dx;
   }
 };
 

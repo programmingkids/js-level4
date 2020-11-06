@@ -110,7 +110,7 @@ mainScene.update = function() {
     this.player.setVelocityX(0);
   }
   // 上カーソルキーをクリックしたら
-  if(cursors.up.isDown &&　this.player.body.touching.down) {
+  if(cursors.up.isDown && this.player.body.touching.down) {
     // ジャンプ
     this.player.setVelocityY(-jumpPower);
   }
