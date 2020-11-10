@@ -17,8 +17,8 @@ mainScene.preload = function() {
   this.load.image('ground2', 'assets/images/ground2.png');
   // プレイヤースプライトの読み込み
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
-  // コイン画像の読み込み
-  this.load.image('coin', 'assets/images/coin.png');
+  // 敵画像の読み込み
+  this.load.image('enemy01', 'assets/images/enemy01.png');
 };
 
 mainScene.create = function() {
@@ -56,42 +56,34 @@ mainScene.create = function() {
       frameRate: 10,
       repeat: -1
   });
-
-  // 床グループ作成
-  this.floorGroup = this.physics.add.staticGroup();
-  var floor = this.floorGroup.create(650, 400,'ground2');
-  floor.setDisplaySize(300,20);
-  floor.refreshBody();
-  // 床グループとプレイヤーの衝突
-  this.physics.add.collider(this.player, this.floorGroup);
   
-  this.score = 0;
+  // 敵の作成
+  this.enemy01 = this.physics.add.image(750, 400, 'enemy01');
+  // 敵のサイズ変更
+  this.enemy01.setDisplaySize(50,50);
+  this.enemy01.setCollideWorldBounds(true);
+  this.enemy01.setBounce(0.8);
+  // 敵にX方向の力を加える
+  this.enemy01.setVelocityX(-80);
   
-  // スコアを文字で表示する
-  this.scoreText = this.add.text(600, 20, 'スコア: ' + this.score, {
-    font: '28px Open Sans',
-    fill: '#ff0000'
-  });
+  // 敵と地面が衝突
+  this.physics.add.collider(this.enemy01, this.ground);
+  // 敵とプレイヤーの衝突したときの処理
+  this.physics.add.collider(this.player, this.enemy01, this.hitEnemy, null, this);
   
-  // ここにプログラムを作成します
-  // 床2の作成
-  
-  
-  
-  // コイングループの作成
-  
-  
-
-  // 1秒ごとにコインを作成する
-  
-  
-  
+  // ゲームオーバーフラグ
+  this.isGameOver = false;
 };
 
 mainScene.update = function() {
+  if(this.isGameOver) {
+    // ゲームオーバー
+    return;
+  }
+  
   var runSpeed = 200;
   var jumpPower = 350;
-  
+
   var cursors = this.input.keyboard.createCursorKeys();
   if(cursors.right.isDown) {
     // 右向きのアニメーション
@@ -116,20 +108,15 @@ mainScene.update = function() {
   }
 };
 
-mainScene.hitCoin = function (player, coin) {
-  // ここにプログラムを作成します
-  // プレイヤーとコインが衝突したときの処理
-  
-  
-  
-};
-
-mainScene.createCoin = function() {
-  // ここにプログラムを作成します
-  // コインの作成
-  
-  
-  
+mainScene.hitEnemy = function (player, enemy) {
+  // 物理エンジン停止
+  this.physics.pause();
+  // プレイヤを赤くする
+  this.player.setTint(0xff0000);
+  // プレイヤーのアニメーション停止
+  this.player.anims.stop();
+  // ゲームオーバー
+  this.isGameOver = true;
 };
 
 var config = {

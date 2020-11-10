@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  this.load.image('ground2', 'assets/images/ground2.png');
+  // プレイヤースプライトの読み込み
+  this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
+  // 敵画像の読み込み
+  this.load.image('enemy01', 'assets/images/enemy01.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 物理エンジン対応のプレイヤスプライト読み込み
+  this.player = this.physics.add.sprite(100, 535, 'player');
+  // プレイヤーの表示サイズ変更
+  this.player.setDisplaySize(50,50);
+  // プレイヤーの最初のフレームを設定
+  this.player.setFrame(7);
+  // プレイヤーがゲーム空間と衝突
+  this.player.setCollideWorldBounds(true);
+  
+  // プレイヤーと地面の衝突
+  this.physics.add.collider(this.player, this.ground);
+  
+  // 左向きのアニメーション
+  this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 3, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  // 右向きのアニメーション
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  
+  // 床グループ作成
+  this.floorGroup = this.physics.add.staticGroup();
+  var floor = this.floorGroup.create(650, 400,'ground2');
+  floor.setDisplaySize(300,20);
+  floor.refreshBody();
+  // 床グループとプレイヤーの衝突
+  this.physics.add.collider(this.player, this.floorGroup);
+  
+  // 作る敵の最大値
+  this.maxEnemy = 3;
+  // 敵の数
+  this.enemyCount = 0;
+  
+  // 敵グループの作成
+  this.enemyGroup = this.physics.add.group();
+  // 敵グループと地面の衝突
+  this.physics.add.collider(this.enemyGroup, this.ground);
+  // 敵グループとプレイヤーの衝突したときの処理
+  this.physics.add.collider(this.player, this.enemyGroup, this.hitEnemy, null, this);
+  // 敵グループと床グループの衝突
+  this.physics.add.collider(this.enemyGroup, this.floorGroup);
+  
+  // 最初の敵を作る
+  this.createEnemy();
+    
+  // 3秒ごとに敵を作成する
+  this.timeEvent = this.time.addEvent({
+    delay: 3000,
+    callback: this.createEnemy,
+    loop: true,
+    callbackScope: this
+  });
+  
+  // ゲームオーバーフラグ
+  this.isGameOver = false;
+};
+
+mainScene.update = function() {
+  if(this.isGameOver) {
+    // ゲームオーバー
+    return;
+  }
+  
+  var runSpeed = 200;
+  var jumpPower = 350;
+
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.right.isDown) {
+    // 右向きのアニメーション
+    this.player.anims.play('right', true);
+    // 右に移動
+    this.player.setVelocityX(runSpeed);
+  } else if(cursors.left.isDown) {
+    // 左向きのアニメーション
+    this.player.anims.play('left', true);
+    // 左に移動
+    this.player.setVelocityX(-runSpeed);
+  } else {
+    // アニメーション停止
+    this.player.anims.stop();
+    // 移動停止
+    this.player.setVelocityX(0);
+  }
+  // スペースキーをクリックしたら
+  if(cursors.space.isDown && this.player.body.onFloor()) {
+    // ジャンプ
+    this.player.setVelocityY(-jumpPower);
+  }
+};
+
+mainScene.hitEnemy = function (player, enemy) {
+  // 物理エンジン停止
+  this.physics.pause();
+  // プレイヤを赤くする
+  this.player.setTint(0xff0000);
+  // プレイヤーのアニメーション停止
+  this.player.anims.stop();
+  // ゲームオーバー
+  this.isGameOver = true;
+};
+
+mainScene.createEnemy = function() {
+  if(this.enemyCount >= this.maxEnemy) {
+    // maxEnemy以上は作らない
+    return;
+  }
+  // 敵の作成
+  var enemy = this.enemyGroup.create(750, 300, 'enemy01');
+  // 敵のサイズ変更
+  enemy.setDisplaySize(50,50);
+  // 敵はゲーム領域と衝突
+  enemy.setCollideWorldBounds(true);
+  // 敵に反発力を設定する
+  enemy.setBounce(0.8);
+  // 敵にX方向のランダムな力を加える
+  var speed = Phaser.Math.RND.between(-100, -50);
+  enemy.setVelocityX(speed);
+  // 作成した敵の数をカウントアップする
+  this.enemyCount++;
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

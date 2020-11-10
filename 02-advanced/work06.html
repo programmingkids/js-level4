@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  // プレイヤースプライトの読み込み
+  this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
+  // コイン画像の読み込み
+  this.load.image('coin', 'assets/images/coin.png');
+  // タイルのスプライトシートの読み込み
+  this.load.spritesheet('tiles','assets/images/tiles.png', {frameWidth: 70, frameHeight: 70});
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 物理エンジン対応のプレイヤスプライト読み込み
+  this.player = this.physics.add.sprite(100, 500, 'player');
+  // プレイヤーの表示サイズ変更
+  this.player.setDisplaySize(70,70);
+  // プレイヤーの最初のフレームを設定
+  this.player.setFrame(7);
+  // プレイヤーがゲーム空間と衝突
+  this.player.setCollideWorldBounds(true);
+  // プレイヤーと地面の衝突
+  this.physics.add.collider(this.player, this.ground);
+  
+  // 左向きのアニメーション
+  this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 3, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  // 右向きのアニメーション
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  
+  // スコア
+  this.score = 0;
+    
+  // スコアを文字で表示する
+  this.scoreText = this.add.text(600, 20, 'スコア：' + this.score, {
+    font: '28px Open Sans',
+    fill: '#ff0000'
+  });
+  
+  // プレイヤーと衝突するためのタイルグループ
+  this.tileGroup = this.physics.add.group();
+  // タイルグループとプレイヤーの衝突
+  this.physics.add.collider(this.player, this.tileGroup, this.hitTile, null, this);
+
+  // 1枚目のタイルの作成
+  var tile1 = this.tileGroup.create(200, 400, "tiles", 3);
+  // タイルの表示サイズ変更
+  tile1.setDisplaySize(70, 70);
+  // タイルを動かなくする
+  tile1.setImmovable(true);
+  // タイルが重力の影響を受けない
+  tile1.body.setAllowGravity(false);
+  
+  // 2枚目のタイルの作成
+  var tile2 = this.tileGroup.create(270, 400, "tiles", 6);
+  tile2.setDisplaySize(70, 70);
+  tile2.setImmovable(true);
+  tile2.body.setAllowGravity(false);
+
+  // 3枚目のタイル作成
+  var tile3 = this.tileGroup.create(500, 400, "tiles", 12);
+  tile3.setDisplaySize(70, 70);
+  tile3.setImmovable(true);
+  tile3.body.setAllowGravity(false);
+
+  // 4枚目のタイル作成
+  var tile4 = this.tileGroup.create(570, 400, "tiles", 14);
+  tile4.setDisplaySize(70, 70);
+  tile4.setImmovable(true);
+  tile4.body.setAllowGravity(false);
+
+  // コイングループの作成
+  this.createCoinGroup();
+};
+
+mainScene.update = function() {
+  var runSpeed = 200;
+  var jumpPower = 350;
+  
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.right.isDown) {
+    // 右向きのアニメーション
+    this.player.anims.play('right', true);
+    // 右に移動
+    this.player.setVelocityX(runSpeed);
+  } else if(cursors.left.isDown) {
+    // 左向きのアニメーション
+    this.player.anims.play('left', true);
+    // 左に移動
+    this.player.setVelocityX(-runSpeed);
+  } else {
+    // アニメーション停止
+    this.player.anims.stop();
+    // 移動停止
+    this.player.setVelocityX(0);
+  }
+  // スペースキーをクリックしたら
+  if(cursors.space.isDown && this.player.body.touching.down) {
+    // ジャンプ
+    this.player.setVelocityY(-jumpPower);
+  }
+};
+
+mainScene.createCoinGroup = function() {
+  // コイングループ作成
+  this.coinGroup = this.physics.add.group();
+  // コイングループと地面の衝突
+  this.physics.add.collider(this.coinGroup, this.ground);
+  // コイングループとタイルグループの衝突
+  this.physics.add.collider(this.coinGroup, this.tileGroup);
+  // プレイヤーとコイングループの衝突
+  this.physics.add.overlap(this.player, this.coinGroup, this.hitCoin, null, this);
+};
+
+mainScene.hitTile = function(player, tile) {
+  // プレイヤーの上側とタイルの下側が衝突しているなら
+  if (player.body.touching.up && tile.body.touching.down) {
+    // コインを作成（引数でプレイヤーと衝突したタイルを渡す）
+    this.createCoin(player, tile);
+  }
+};
+
+mainScene.createCoin = function(player, tile) {
+  // 衝突したタイルの中心のX座標
+  var x = tile.body.center.x;
+  // 衝突したタイルの上側に35を減算した位置がY座標
+  var y = tile.body.top - 35;
+  // 衝突したタイルのX座標とY座標の上側にコインを作成する
+  var coin = this.coinGroup.create(x, y, 'coin');
+  // コインの表示サイズ変更
+  coin.setDisplaySize(70,70);
+  // コインにY方向の加速を設定
+  coin.setVelocityY(-200);
+  // 必要に応じてX方向の加速度を設定
+  coin.setVelocityX(50);
+};
+
+mainScene.hitCoin = function (player, coin) {
+  // コイン削除
+  coin.destroy();
+  // スコアの乱数作成（１～１０） 
+  var score = Phaser.Math.RND.between(1, 10);
+  // スコア加算
+  this.score += score;
+  // スコアを再表示
+  this.scoreText.setText("スコア：" + this.score);
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

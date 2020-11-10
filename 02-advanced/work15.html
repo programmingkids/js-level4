@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  this.load.image('space', 'assets/images/space.png');
+  // キャノン画像の読み込み
+  this.load.image('cannon', 'assets/images/cannon.png');
+  // ミサイル画像の読み込み
+  this.load.image('missile', 'assets/images/missile.png');
+  // 敵画像の読み込み
+  this.load.image('ufo', 'assets/images/ufo.png');
+  // 爆弾画像の読み込み
+  this.load.image('bomb', 'assets/images/bomb2.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+
+  // 地面作成（物理エンジン対象ではなく、背景となる地面）
+  this.createGround();
+  
+  // キャノンの作成
+  this.createCannon();
+  
+  // スペースキーでミサイル発射
+  this.input.keyboard.on('keydown-SPACE', function(event) {
+    this.createMissile();
+  }, this);
+  
+  // ゲームオーバーを表す変数。初期値は「false」
+  this.isGameOver = false;
+  
+  // ミサイルグループの作成
+  this.createMissileGroup();
+  
+  // 敵UFOの作成
+  this.createUFO();
+  
+  // 敵爆弾グループの作成
+  this.createBombGroup();
+};
+
+mainScene.update = function() {
+  // ゲームオーバーなら「update」を実行しない
+  if( this.isGameOver ) {
+    return false;
+  }
+  
+  var speed = 600;
+  
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.right.isDown) {
+    // 右に移動
+    this.cannon.setVelocityX(speed);
+  } else if(cursors.left.isDown) {
+    // 左に移動
+    this.cannon.setVelocityX(-speed);
+  } else {
+    // 移動停止
+    this.cannon.setVelocityX(0);
+  }
+  
+  // 敵となるUFOが画面上部を左右に移動する
+  if( this.ufo.x > 700 ) {
+    this.ufo.dx = -this.ufo.dx;
+  }
+  if( this.ufo.x < 100 ) {
+    this.ufo.dx = -this.ufo.dx;
+  }
+  this.ufo.x += this.ufo.dx;
+};
+
+mainScene.createGround = function() {
+  // 物理エンジンではなく背景としての地面を作成
+  var map01Group = this.add.group({
+    key: 'space',
+    frameQuantity: 192
+  });
+  Phaser.Actions.GridAlign(map01Group.getChildren(), {
+    width: 16,
+    height: 12,
+    cellWidth: 50,
+    cellHeight: 50,
+    x: 25,
+    y: 25
+  });
+};
+
+mainScene.createCannon = function() {
+  // キャノンを作成する
+  this.cannon = this.physics.add.image(400, 575, 'cannon');
+  this.cannon.setDisplaySize(70, 70);
+  this.cannon.setCollideWorldBounds(true);
+};
+
+mainScene.createMissileGroup = function() {
+  // ミサイルグループを作成する
+  this.missleGroup = this.physics.add.group();
+};
+
+mainScene.createMissile = function() {
+  // キャノンが発射するミサイルを作成する
+  var x = this.cannon.body.center.x;
+  var y = this.cannon.body.center.y;
+  
+  var missile = this.missleGroup.create(x, y, 'missile');
+  missile.setDisplaySize(100, 100);
+  var speed = 700;
+  missile.setVelocityY(-speed);
+  missile.body.setAllowGravity(false);
+};
+
+mainScene.createUFO = function() {
+  // 敵となるUFOを作成する
+  this.ufo = this.physics.add.image(400, 50, "ufo");
+  
+  // UFOの表示サイズ変更
+  this.ufo.setDisplaySize(200, 100);
+  // UFOは重量の影響を受けない
+  this.ufo.body.setAllowGravity(false);
+  
+  // UFOのHP
+  this.ufo.hp = 10;
+  // UFOのX方向の移動量
+  this.ufo.dx = 2;
+  // UFOとミサイルグループの衝突
+  this.physics.add.overlap(this.ufo, this.missleGroup, this.hitUFO, null, this);
+};
+
+mainScene.createBombGroup = function() {
+  // 爆弾グループを作成する
+  this.bombGroup = this.physics.add.group();
+  
+  // キャノンと爆弾グループの衝突
+  this.physics.add.overlap(this.cannon, this.bombGroup, this.hitCannon, null, this);
+  // 爆弾グループとミサイルグループの衝突
+  this.physics.add.overlap(this.bombGroup, this.missleGroup, this.hitBomb, null, this);
+  
+  // タイマー処理により、0.5秒ごとに爆弾を作成する
+  this.bombTimer = this.time.addEvent({
+    delay : 500,
+    callback : this.createBomb,
+    loop : true,
+    callbackScope : this,
+  });
+};
+
+mainScene.createBomb = function() {
+  // UFOの位置に爆弾を作成する
+  var x = this.ufo.body.center.x;
+  var y = this.ufo.body.center.y;
+  var bomb = this.bombGroup.create(x, y,'bomb');
+  
+  // 爆弾の表示サイズ変更
+  bomb.setDisplaySize(70,70);
+  // 爆弾にY方向に加速を設定
+  bomb.setVelocityY(300);
+};
+
+mainScene.hitCannon = function(player, bomb) {
+  // キャノンに爆弾が衝突したのでゲームオーバー
+  this.gameOver();
+};
+
+mainScene.hitBomb = function(bomb, missile) {
+  // 爆弾とミサイルが衝突したので両方を削除
+  bomb.destroy();
+  missile.destroy();
+};
+
+mainScene.hitUFO = function(ufo, missile) {
+  // UFOにミサイルが衝突したときの処理
+  
+  // ミサイルを削除
+  missile.destroy();
+  // UFOのHPを減少させる
+  this.ufo.hp--;
+  // UFOのHPが「0」以下ならゲームクリア
+  if( this.ufo.hp <= 0 ) {
+    this.gameClear();
+  }
+};
+
+mainScene.gameOver = function() {
+  /*
+   * ゲームオーバーの処理
+   * キャノンに爆弾が衝突した
+   */
+  // ゲームオーバーの変数を「true」
+  this.isGameOver = true;
+  // 物理エンジン停止
+  this.physics.pause();
+  // キャノンを赤色にする
+  this.cannon.setTint(0xff0000);
+  // 爆弾作成のタイマーを停止
+  this.bombTimer.remove();
+};
+
+mainScene.gameClear = function() {
+  /*
+   * ゲームクリアの処理
+   * UFOのHPが「0」になった
+   */
+  // UFOを赤色にする
+  this.ufo.setTint(0xA52A2A);
+  // 爆弾作成のタイマーを停止
+  this.bombTimer.remove();
+  
+  // 1秒後にUFOを削除するタイマー処理
+  this.time.addEvent({
+    delay : 1000,
+    callback : this.destroyUFO,
+    loop : false,
+    callbackScope : this,
+  });
+};
+
+mainScene.destroyUFO = function() {
+  this.ufo.destroy();
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true,
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

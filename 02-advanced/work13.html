@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  // プレイヤースプライトの読み込み
+  this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
+  // ボール画像の読み込み
+  this.load.image('ball', 'assets/images/ball.png');
+  // 敵画像の読み込み
+  this.load.image('enemy', 'assets/images/enemy11.png');
+  // 敵ファイヤー画像の読み込み
+  this.load.image('fire', 'assets/images/fire.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 物理エンジン対応のプレイヤスプライト読み込み
+  this.player = this.physics.add.sprite(100, 500, 'player');
+  // プレイヤーの表示サイズ変更
+  this.player.setDisplaySize(70,70);
+  // プレイヤーの最初のフレームを設定
+  this.player.setFrame(7);
+  // プレイヤーがゲーム空間と衝突
+  this.player.setCollideWorldBounds(true);
+  // プレイヤーと地面の衝突
+  this.physics.add.collider(this.player, this.ground);
+  
+  // 左向きのアニメーション
+  this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 3, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  // 右向きのアニメーション
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+  });
+
+  // プレイヤーが最初に向いている方向を変数に代入
+  this.player.direction = "right";
+  // ボールグループを作成
+  this.createBallGroup();
+  
+  // スペースキーでボール発射
+  this.input.keyboard.on('keydown-SPACE', function(event) {
+    // ボールを作成
+    this.createBall();
+  }, this);
+  
+  // ゲームオーバーを表す変数。初期値は「false」
+  this.isGameOver = false;
+  // 敵の作成
+  this.createEnemy();
+};
+
+mainScene.update = function() {
+  // ゲームオーバーなら「update」を実行しない
+  if( this.isGameOver ) {
+    return false;
+  }
+  
+  var runSpeed = 200;
+  var jumpPower = 350;
+  
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.right.isDown) {
+    // 右向きのアニメーション
+    this.player.anims.play('right', true);
+    // 右に移動
+    this.player.setVelocityX(runSpeed);
+    // 右方向を表す変数を代入
+    this.player.direction = "right";
+  } else if(cursors.left.isDown) {
+    // 左向きのアニメーション
+    this.player.anims.play('left', true);
+    // 左に移動
+    this.player.setVelocityX(-runSpeed);
+    // 左方向を表す変数を代入
+    this.player.direction = "left";
+  } else {
+    // アニメーション停止
+    this.player.anims.stop();
+    // 移動停止
+    this.player.setVelocityX(0);
+  }
+  // 上カーソルキーをクリックしたら
+  if(cursors.up.isDown && this.player.body.touching.down) {
+    // ジャンプ
+    this.player.setVelocityY(-jumpPower);
+  }
+  
+};
+
+mainScene.createBallGroup = function() {
+  // ボールグループ作成
+  this.ballGroup = this.physics.add.group();
+  // ボールグループと地面の衝突
+  this.physics.add.collider(this.ballGroup, this.ground);
+};
+
+mainScene.createBall = function() {
+  // プレイヤーのX座標
+  var x = this.player.body.center.x;
+  // プレイヤーのY座標
+  var y = this.player.body.center.y;
+  
+  // ボール作成
+  var ball = this.ballGroup.create(x, y, 'ball');
+  // ボールに各種設定
+  ball.setDisplaySize(20, 20);
+  ball.body.setAllowGravity(false);
+  
+  // ボールの速度設定
+  var speed = 700;
+  if(this.player.direction == "right") {
+    // プレイヤーが右向きなら右方向に加速  
+    ball.setVelocityX(speed);
+  } else {
+    // プレイヤーが左向きなら左方向に加速  
+    ball.setVelocityX(-speed);
+  }
+};
+
+mainScene.createEnemy = function() {
+  // 敵の作成
+  this.enemy = this.physics.add.image(700, 500, 'enemy');
+  // 敵の衝突サイズ変更
+  this.enemy.body.setSize(200,200);
+  // 敵の表示サイズ変更
+  this.enemy.setDisplaySize(200, 200);
+  
+  // 敵のHPの初期設定
+  this.enemy.hp = 10;
+  
+  // 敵ファイヤーグループ作成
+  this.enemyFireGroup = this.physics.add.group();
+  
+  // タイマー処理で2秒ごとに、敵ファイヤーを作成
+  this.timeEvent = this.time.addEvent({
+    delay : 2000,
+    callback : this.createEnemyFire,
+    loop : true,
+    callbackScope : this
+  });  
+  
+  // 敵と地面の衝突
+  this.physics.add.collider(this.enemy, this.ground);
+  // 敵とボールグループの衝突
+  this.physics.add.overlap(this.enemy, this.ballGroup, this.hitBall, null, this);
+  // プレイヤーと敵の衝突
+  this.physics.add.overlap(this.player, this.enemy, this.hitEnemy, null, this);
+  // プレイヤーと敵ファイヤーグループの衝突
+  this.physics.add.overlap(this.player, this.enemyFireGroup, this.hitEnemyFire, null, this);
+};
+
+mainScene.createEnemyFire = function() {
+  // 敵ファイヤのX座標とY座標
+  var x = this.enemy.body.center.x;
+  var y = this.enemy.body.center.y;
+  
+  // 敵ファイヤーの作成
+  var fire = this.enemyFireGroup.create(x, y, 'fire');
+  // 敵ファイヤーを横向きに回転
+  fire.setAngle(90);
+  // 敵ファイヤーの衝突サイズ変更
+  fire.body.setSize(20, 20);
+  // 敵ファイヤーの表示サイズ変更
+  fire.setDisplaySize(80,80);
+  // 敵ファイヤーは重力の影響を受けない
+  fire.body.setAllowGravity(false);
+  
+  // 敵ファイヤーの速度をランダムにするための配列
+  var fireSpeeds = [-300, -200, -100];
+  // 敵ファイヤーの速度をランダムにする
+  var speed = Phaser.Math.RND.pick(fireSpeeds);
+  // 敵ファイヤーにランダムな左向きの加速を加える  
+  fire.setVelocityX(speed);
+};
+
+mainScene.hitEnemy = function(player, enemy) {
+  // プレイヤーと敵が衝突したのでゲームオーバー
+  this.gameOver();
+};
+
+mainScene.hitEnemyFire = function(player, enemyFire) {
+  // プレイヤーと敵ファイヤーが衝突したのでゲームオーバー
+  this.gameOver();
+};
+
+mainScene.hitBall = function( enemy, ball) {
+  // ボールと敵が衝突したので、ボールを削除
+  ball.destroy();
+  // 敵のHPが減少
+  this.enemy.hp--;
+  
+  // 敵のHPが「0」以下なら
+  if( this.enemy.hp <= 0 ) {
+    // ゲームクリア
+    this.gameClear();
+  }
+};
+
+
+mainScene.gameOver = function() {
+  // ゲームオーバーにして、updateの動作停止
+  this.isGameOver = true;
+  // 物理エンジン停止
+  this.physics.pause();
+  // プレイヤーを赤色にする
+  this.player.setTint(0xff0000);
+  // プレイヤーのアニメーション停止
+  this.player.anims.stop();
+  // 敵ファイヤグループのタイマー停止
+  this.timeEvent.remove();
+};
+
+mainScene.gameClear = function() {
+  // 敵を赤色にする
+  this.enemy.setTint(0xA52A2A);
+  // 敵ファイヤーを作成するタイマーの停止
+  this.timeEvent.remove();
+  
+  // 1秒後に敵を削除するタイマー処理
+  this.time.addEvent({
+    delay : 1000,
+    callback : this.destroyEnemy,
+    loop : false,
+    callbackScope : this,
+  });
+};
+
+mainScene.destroyEnemy = function() {
+  // 敵を削除する
+  this.enemy.destroy();
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>

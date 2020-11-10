@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<script src="//cdn.jsdelivr.net/npm/phaser@3.17.0/dist/phaser.js"></script>
+<style>
+body {
+  margin: 0;
+}
+</style>
+<script>
+var mainScene = new Phaser.Scene();
+
+mainScene.preload = function() {
+  // 地面画像の読み込み
+  this.load.image('ground', 'assets/images/ground.png');
+  // プレイヤースプライトの読み込み
+  this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
+  // ボール画像の読み込み
+  this.load.image('ball', 'assets/images/ball.png');
+  // ボックス画像の読み込み
+  this.load.image('box', 'assets/images/boxItem.png');
+  // 宝石画像の読み込み
+  this.load.image('gemRed', 'assets/images/gemRed.png');
+};
+
+mainScene.create = function() {
+  // 背景色の設定
+  this.cameras.main.setBackgroundColor('#99CCFF');
+
+  // 地面を作成する。タイルスプライトで最下部に敷き詰める
+  this.ground = this.add.tileSprite(400, config.height-20, config.width, 40, 'ground');
+  // 地面のタイルスプライトを物理エンジン対象にする
+  this.physics.add.existing(this.ground, true);
+  
+  // 物理エンジン対応のプレイヤスプライト読み込み
+  this.player = this.physics.add.sprite(100, 500, 'player');
+  // プレイヤーの表示サイズ変更
+  this.player.setDisplaySize(70,70);
+  // プレイヤーの最初のフレームを設定
+  this.player.setFrame(7);
+  // プレイヤーがゲーム空間と衝突
+  this.player.setCollideWorldBounds(true);
+  // プレイヤーと地面の衝突
+  this.physics.add.collider(this.player, this.ground);
+  
+  // 左向きのアニメーション
+  this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('player', { start: 3, end: 5 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  // 右向きのアニメーション
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('player', { start: 6, end: 8 }),
+      frameRate: 10,
+      repeat: -1
+  });
+  
+  // ボールグループを作成
+  this.createBallGroup();
+
+  // プレイヤーが最初に向いている方向を変数に代入
+  this.player.direction = "right";
+  
+  // プレイヤーがボールを発射できるかどうかの変数
+  this.isShoot = false;
+  
+  // ボックスグループの作成
+  this.createBoxGroup();
+  
+  // 宝石グループを作成
+  this.createGemGroup();
+  
+  // スペースキーでボール発射
+  this.input.keyboard.on('keydown-SPACE', function(event) {
+    // 変数「this.isShoot」が「true」なら発射可能
+    if(this.isShoot) {
+      // ボールを作成
+      this.createBall();
+    }
+  }, this);
+};
+
+mainScene.update = function() {
+  var runSpeed = 200;
+  var jumpPower = 350;
+  
+  var cursors = this.input.keyboard.createCursorKeys();
+  if(cursors.right.isDown) {
+    // 右向きのアニメーション
+    this.player.anims.play('right', true);
+    // 右に移動
+    this.player.setVelocityX(runSpeed);
+    // 右方向を表す変数を代入
+    this.player.direction = "right";
+  } else if(cursors.left.isDown) {
+    // 左向きのアニメーション
+    this.player.anims.play('left', true);
+    // 左に移動
+    this.player.setVelocityX(-runSpeed);
+    // 左方向を表す変数を代入
+    this.player.direction = "left";
+  } else {
+    // アニメーション停止
+    this.player.anims.stop();
+    // 移動停止
+    this.player.setVelocityX(0);
+  }
+  // 上カーソルキーをクリックしたら
+  if(cursors.up.isDown && this.player.body.touching.down) {
+    // ジャンプ
+    this.player.setVelocityY(-jumpPower);
+  }
+};
+
+mainScene.createBallGroup = function() {
+  // ボールグループ作成
+  this.ballGroup = this.physics.add.group();
+  // ボールグループと地面の衝突
+  this.physics.add.collider(this.ballGroup, this.ground);
+};
+
+mainScene.createBall = function() {
+  // プレイヤーのX座標
+  var x = this.player.body.center.x;
+  // プレイヤーのY座標
+  var y = this.player.body.center.y;
+  
+  // ボール作成
+  var ball = this.ballGroup.create(x, y, 'ball');
+  // ボールに各種設定
+  ball.setDisplaySize(20, 20);
+  ball.setBounce(0.5);
+  ball.body.setAllowGravity(false);
+  
+  // ボールの速度設定
+  var speed = 700;
+  if(this.player.direction == "right") {
+    // プレイヤーが右向きなら右方向に加速  
+    ball.setVelocityX(speed);
+  } else {
+    // プレイヤーが左向きなら左方向に加速  
+    ball.setVelocityX(-speed);
+  }
+};
+
+mainScene.createBoxGroup = function() {
+  // プレイヤーと衝突するためのボックスグループ
+  this.boxGroup = this.physics.add.group();
+  // プレイヤーとボックスグループの衝突
+  this.physics.add.collider(this.player, this.boxGroup, this.hitBox, null, this);
+  // ボックスグループとボールグループの衝突
+  this.physics.add.collider(this.boxGroup, this.ballGroup);
+  // ボックスを作成
+  this.createBox();
+};
+
+mainScene.createBox = function() {
+  // 1枚目のボックスの作成
+  var box1 = this.boxGroup.create(300, 400, "box");
+  // ボックスの表示サイズ変更
+  box1.setDisplaySize(70, 70);
+  // ボックスを動かなくする
+  box1.setImmovable(true);
+  // ボックスが重力の影響を受けない
+  box1.body.setAllowGravity(false);
+  // ボックスにプレイヤーが衝突したかどうかを判定する変数
+  box1.isHit = false;
+  
+  // 2枚目のボックスの作成
+  var box2 = this.boxGroup.create(600, 400, "box");
+  box2.setDisplaySize(70, 70);
+  box2.setImmovable(true);
+  box2.body.setAllowGravity(false);
+  box2.isHit = false;
+};
+
+mainScene.hitBox = function(player, box) {
+  // プレイヤーの上側とボックスの下側が衝突しているなら
+  if (player.body.touching.up && box.body.touching.down) {
+    // 「box.isHit」が「false」なら宝石を作成
+    if( !box.isHit ) {
+      // 宝石を作成
+      this.createGem(player, box);
+      // プレイヤーがボックスに衝突したので、「true」を代入
+      box.isHit = true;
+    }
+  }
+};
+
+mainScene.createGemGroup = function() {
+  // 宝石グループの作成
+  this.gemGroup = this.physics.add.group();
+  // 宝石グループと地面の衝突
+  this.physics.add.collider(this.gemGroup, this.ground);
+  // 宝石グループとボックスグループの衝突
+  this.physics.add.collider(this.gemGroup, this.boxGroup);
+  // 宝石グループとプレイヤーの衝突
+  this.physics.add.overlap(this.player, this.gemGroup, this.hitGem, null, this);
+};
+
+mainScene.createGem = function(player, box) {
+  // 宝石のX座標はボックスのX座標
+  var x = box.body.center.x;
+  // 宝石のY座標はボックスの上側
+  var y = box.body.top - 35;
+  // 宝石作成
+  var gem = this.gemGroup.create(x, y, "gemRed");
+  // 宝石の各種設定
+  gem.setBounce(0.5);
+  gem.body.setSize(50,50);
+  gem.setDisplaySize(80, 80);
+  gem.setVelocityY(-100);
+};
+
+mainScene.hitGem = function(plyaer, gem) {
+  // 宝石を削除
+  gem.destroy();
+  // ボールを発射する変数を「true」にする
+  this.isShoot = true;
+};
+
+var config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 300 },
+      debug: true
+    }
+  },
+  scene: [mainScene],
+};
+var game = new Phaser.Game(config);
+</script>
+</head>
+<body>
+</body>
+</html>
