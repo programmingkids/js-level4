@@ -30,16 +30,10 @@ mainScene.create = function() {
   this.physics.add.existing(this.ground, true);
   
   // 四角形画像グループを作成
-  this.createSquareGroup();
+  
   
   // 0.5秒ごとに作成する
-  this.timeEvent = this.time.addEvent({
-    delay: 500,
-    callback: this.createSquare,
-    loop: true,
-    callbackScope: this
-  });
-
+  
 };
 
 mainScene.update = function() {
@@ -48,18 +42,12 @@ mainScene.update = function() {
 
 mainScene.createSquareGroup = function() {
   // 四角形画像グループの作成
-  this.squareGroup = this.physics.add.group();
-  // 四角形画像グループと地面の衝突
-  this.physics.add.collider(this.squareGroup, this.ground);
+  
 };
 
 mainScene.createSquare = function() {
   // 四角形の作成
-  var square = this.squareGroup.create(400, 40, "square_red");
-  square.setDisplaySize(40,40);
-  square.setBounce(0.5);
-  square.setCollideWorldBounds(true);
-  square.setVelocity(200, 200);
+  
 };
 
 var config = {

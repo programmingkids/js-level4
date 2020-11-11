@@ -41,7 +41,7 @@ mainScene.create = function() {
   this.physics.add.collider(this.ball, this.ground);
   
   // 衝突対象の四角形を作成するメソッドの呼び出し
-  this.createTargetSquare();
+  
 };
 
 mainScene.update = function() {
@@ -52,24 +52,10 @@ mainScene.update = function() {
 };
 
 mainScene.createTargetSquare = function() {
-  // 衝突対象グループの作成
-  this.targetGroup = this.physics.add.group();
-  // 衝突対象グループと地面の衝突
-  this.physics.add.collider(this.targetGroup, this.ground);
-  // 衝突対象グループとボールの衝突
-  this.physics.add.collider(this.targetGroup, this.ball);
-  // 衝突対象グループ同士の衝突
-  this.physics.add.collider(this.targetGroup, this.targetGroup);
-  
-  // 四角形の画像を縦に3個作成
-  for( var i = 0; i < 3; i++) {
-    var x = 500;
-    var y = 460 + i * 40;
-    var square_red = this.targetGroup.create(x, y, 'square_red');
-    square_red.setDisplaySize(40,40);
-    square_red.setBounce(0.5);
-    square_red.setCollideWorldBounds(true);
-  }
+
+
+
+
 };
 
 var config = {

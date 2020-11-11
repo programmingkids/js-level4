@@ -34,15 +34,10 @@ mainScene.create = function() {
   this.physics.add.existing(this.ground, true);
   
   // 四角形グループを作成
-  this.createSquareGroup();
+  
   
   // 0.5秒ごとに作成する
-  this.timeEvent = this.time.addEvent({
-    delay: 500,
-    callback: this.createSquare,
-    loop: true,
-    callbackScope: this
-  });
+  
 };
 
 mainScene.update = function() {
@@ -51,33 +46,12 @@ mainScene.update = function() {
 
 mainScene.createSquareGroup = function() {
   // 四角形グループの作成
-  this.squareGroup = this.physics.add.group();
-  // 四角形グループと地面の衝突
-  this.physics.add.collider(this.squareGroup, this.ground);
-  // 四角形グループ同士の衝突
-  this.physics.add.collider(this.squareGroup, this.squareGroup);
+  
 };
 
 mainScene.createSquare = function() {
   // 作成する四角形をランダムに選択
-  var square_images = ["square_red", "square_grey","square_green","square_yellow","square_purple"];
-  var random_image = Phaser.Math.RND.pick(square_images);
   
-  // 作成する四角形のX座標をランダムに選択
-  var random_x = Phaser.Math.RND.between(50, 750);
-  
-  // 四角形を作成（ランダムな画像とランダムなX座標）
-  var square = this.squareGroup.create(random_x, 40, random_image);
-  
-  // 四角形の設定
-  square.setDisplaySize(40,40);
-  square.setBounce(0.5);
-  square.setCollideWorldBounds(true);
-  
-  // 作成する四角形の速度をランダムに選択
-  var square_speeds = [200, 400, -200, -400];
-  var random_speed = Phaser.Math.RND.pick(square_speeds);
-  square.setVelocity(random_speed, 200);
 };
 
 var config = {

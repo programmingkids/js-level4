@@ -49,48 +49,26 @@ mainScene.create = function() {
   floor3.refreshBody();
   
   // 動物グループを作成
-  this.crateAnimalGroup();
+  // ここにプログラムを作成します
+  
   
   // 0.5秒ごとに作成する
-  this.timeEvent = this.time.addEvent({
-    delay: 2000,
-    callback: this.createAnimal,
-    loop: true,
-    callbackScope: this
-  });
+  // ここにプログラムを作成します
+  
 };
 
 mainScene.update = function() {
 
 };
 
-mainScene.crateAnimalGroup = function() {
-  // 動物グループの作成
-  this.animalGroup = this.physics.add.group();
-  // 動物グループと地面の衝突
-  this.physics.add.collider(this.animalGroup, this.ground);
-  // 動物グループとフロアグループの衝突
-  this.physics.add.collider(this.animalGroup, this.floorGroup);
+mainScene.createAnimalGroup = function() {
+  // ここにプログラムを作成します
+  
 };
 
 mainScene.createAnimal = function() {
-  // 作成する動物をランダムに選択
-  var animal_images = ["animal_elephant", "animal_monkey","animal_panda","animal_penguin","animal_rabbit"];
-  var random_image = Phaser.Math.RND.pick(animal_images);
+  // ここにプログラムを作成します
   
-  // 作成する動物のX座標をランダムに選択
-  var random_x = Phaser.Math.RND.between(50, 750);
-  // 動物を作成
-  var animal = this.animalGroup.create(random_x, 50, random_image);
-  // 各種設定
-  animal.setDisplaySize(40, 40);
-  animal.setBounce(0.5);
-  animal.setCollideWorldBounds(true);
-  
-  // 作成する動物の速度をランダムに選択
-  var animal_speeds = [200, 400, -200, -400];
-  var random_speed = Phaser.Math.RND.pick(animal_speeds);
-  animal.setVelocity(random_speed, 200);
 };
 
 var config = {
