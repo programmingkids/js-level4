@@ -57,19 +57,10 @@ mainScene.create = function() {
       repeat: -1
   });
   
-  // 敵の作成
-  this.enemy01 = this.physics.add.image(750, 400, 'enemy01');
-  // 敵のサイズ変更
-  this.enemy01.setDisplaySize(50,50);
-  this.enemy01.setCollideWorldBounds(true);
-  this.enemy01.setBounce(0.8);
-  // 敵にX方向の力を加える
-  this.enemy01.setVelocityX(-80);
   
-  // 敵と地面が衝突
-  this.physics.add.collider(this.enemy01, this.ground);
-  // 敵とプレイヤーの衝突したときの処理
-  this.physics.add.collider(this.player, this.enemy01, this.hitEnemy, null, this);
+  
+  
+  
   
   // ゲームオーバーフラグ
   this.isGameOver = false;
@@ -110,13 +101,10 @@ mainScene.update = function() {
 
 mainScene.hitEnemy = function (player, enemy) {
   // 物理エンジン停止
-  this.physics.pause();
-  // プレイヤを赤くする
-  this.player.setTint(0xff0000);
-  // プレイヤーのアニメーション停止
-  this.player.anims.stop();
-  // ゲームオーバー
-  this.isGameOver = true;
+  
+  
+  
+  
 };
 
 var config = {
