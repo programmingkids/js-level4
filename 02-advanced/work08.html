@@ -17,10 +17,10 @@ mainScene.preload = function() {
   this.load.image('ground2', 'assets/images/ground2.png');
   // プレイヤースプライトの読み込み
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
-  // ボール画像の読み込み
-  this.load.image('ball', 'assets/images/ball.png');
-  // 敵画像の読み込み
-  this.load.image('enemy', 'assets/images/enemy05.png');
+  
+  
+  
+  
 };
 
 mainScene.create = function() {
@@ -72,15 +72,10 @@ mainScene.create = function() {
     this.createBall();
   }, this);
   
-  // 敵グループの作成
-  this.createEnemyGroup();
   
-  this.timer = this.time.addEvent({
-    delay: 2000,
-    callback: this.createEnemy,
-    loop: true,
-    callbackScope : this,
-  });
+  
+  
+  
 };
 
 mainScene.update = function() {
@@ -167,35 +162,24 @@ mainScene.createBall = function() {
 
 mainScene.createEnemyGroup = function() {
   // 敵グループの作成
-  this.enemyGroup = this.physics.add.group();
-  // 敵グループと地面の衝突
-  this.physics.add.collider(this.enemyGroup, this.ground);
-  // 敵グループとフロアグループの衝突
-  this.physics.add.collider(this.enemyGroup, this.floorGroup);
-  // 敵グループとボールグループの衝突
-  this.physics.add.overlap(this.enemyGroup, this.ballGroup, this.hitBall, null, this);
+  
+  
+  
+  
 };
 
 mainScene.createEnemy = function() {
-  // 敵のX座標をランダムに設定
-  var x = Phaser.Math.RND.between(50, 750);
-  // 敵のY座標
-  var y = 50;
-  // 敵の作成
-  var enemy = this.enemyGroup.create(x, y, 'enemy');
   
-  // 敵の各種設定
-  enemy.setDisplaySize(70, 70);
-  enemy.setBounce(0.5);
-  enemy.setCollideWorldBounds(true);
-  enemy.setVelocityX(400);
+  
+  
+  
 };
 
 mainScene.hitBall = function(enemy, ball) {
-  // 敵の削除
-  enemy.destroy();
-  // ボールの削除
-  ball.destroy();
+  
+  
+  
+  
 };
 
 var config = {

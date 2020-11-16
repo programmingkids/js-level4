@@ -16,8 +16,9 @@ mainScene.preload = function() {
   this.load.image('ground', 'assets/images/ground.png');
   // プレイヤースプライトの読み込み
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
-  // ボール画像の読み込み
-  this.load.image('ball', 'assets/images/ball.png');
+  
+  
+  
 };
 
 mainScene.create = function() {
@@ -55,16 +56,10 @@ mainScene.create = function() {
       repeat: -1
   });
   
-  // プレイヤーが最初に向いている方向を変数に代入
-  this.player.direction = "right";
-  // ボールグループを作成
-  this.createBallGroup();
   
-  // スペースキーでボール発射
-  this.input.keyboard.on('keydown-SPACE', function(event) {
-    // ボールを作成
-    this.createBall();
-  }, this);
+  
+  
+  
 };
 
 mainScene.update = function() {
@@ -78,14 +73,14 @@ mainScene.update = function() {
     // 右に移動
     this.player.setVelocityX(runSpeed);
     // 右方向を表す変数を代入
-    this.player.direction = "right";
+    
   } else if(cursors.left.isDown) {
     // 左向きのアニメーション
     this.player.anims.play('left', true);
     // 左に移動
     this.player.setVelocityX(-runSpeed);
     // 左方向を表す変数を代入
-    this.player.direction = "left";
+    
   } else {
     // アニメーション停止
     this.player.anims.stop();
@@ -101,32 +96,17 @@ mainScene.update = function() {
 
 mainScene.createBallGroup = function() {
   // ボールグループ作成
-  this.ballGroup = this.physics.add.group();
-  // ボールグループと地面の衝突
-  this.physics.add.collider(this.ballGroup, this.ground);
+  
+  
+  
+  
 };
 
 mainScene.createBall = function() {
-  // プレイヤーのX座標
-  var x = this.player.body.center.x;
-  // プレイヤーのY座標
-  var y = this.player.body.center.y;
   
-  // ボール作成
-  var ball = this.ballGroup.create(x, y, 'ball');
-  // ボールに各種設定
-  ball.setDisplaySize(20, 20);
-  ball.body.setAllowGravity(false);
   
-  // ボールの速度設定
-  var speed = 700;
-  if(this.player.direction == "right") {
-    // プレイヤーが右向きなら右方向に加速  
-    ball.setVelocityX(speed);
-  } else {
-    // プレイヤーが左向きなら左方向に加速  
-    ball.setVelocityX(-speed);
-  }
+  
+  
 };
 
 var config = {
