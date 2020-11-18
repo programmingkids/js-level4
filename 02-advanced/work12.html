@@ -18,8 +18,8 @@ mainScene.preload = function() {
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
   // ボックス画像の読み込み
   this.load.image('box', 'assets/images/boxCrate.png');
-  // 移動フロア画像の読み込み
-  this.load.image('floorMove', 'assets/images/floorMove.png');
+  
+  
 };
 
 mainScene.create = function() {
@@ -59,10 +59,10 @@ mainScene.create = function() {
   
   // ボックスグループの作成
   this.createBoxGroup();
-  // 移動フロアの移動量
-  this.dx = 2;
-  // 移動フロアの作成
-  this.createFloorMove();
+  
+  
+  
+  
 };
 
 mainScene.update = function() {
@@ -96,20 +96,10 @@ mainScene.update = function() {
     this.player.setVelocityY(-jumpPower);
   }
   
-  // 左に到達したら
-  if( this.floorMove.x < 285 ) {
-    this.dx = -this.dx;
-  }
-  // 右に到達したら
-  if( this.floorMove.x > 515) {
-    this.dx = -this.dx;
-  }
-  // プレイヤーの下側と移動フロアの上側に接触があるなら
-  if( this.player.body.touching.down &&
-      this.floorMove.body.touching.up) {
-    // 移動フロアの左右移動
-    this.floorMove.x += this.dx;
-  }
+  
+  
+  
+  
 };
 
 mainScene.createBoxGroup = function() {
@@ -135,24 +125,18 @@ mainScene.createBox = function() {
 
 mainScene.createFloorMove = function() {
   // 移動フロアの作成
-  this.floorMove = this.physics.add.image(285, 375, "floorMove");
-  // プレイヤーと移動フロアの衝突
-  this.physics.add.collider(this.player, this.floorMove, this.hitFloor, null, this);
-  // 移動フロアのボックスグループの衝突
-  this.physics.add.collider(this.floorMove, this.boxGroup);
   
-  // 移動フロアの各種設定
-  this.floorMove.setDisplaySize(100, 20);
-  this.floorMove.setImmovable(true);
-  this.floorMove.body.setAllowGravity(false);
+  
+  
+  
 };
 
 mainScene.hitFloor = function(player, floorMove) {
   // プレイヤーの下側と移動フロアの上側が接している
-  if(this.player.body.touching.down && this.floorMove.body.touching.up) {
-    // 移動フロアの移動量をプレイヤーのX座標に加算
-    this.player.x += this.dx;
-  }
+  
+  
+  
+  
 };
 
 var config = {
