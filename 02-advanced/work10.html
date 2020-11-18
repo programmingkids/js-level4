@@ -33,23 +33,19 @@ mainScene.create = function() {
   this.createCannon();
   
   // スペースキーでミサイル発射
-  this.input.keyboard.on('keydown-SPACE', function(event) {
-    this.createMissile();
-  }, this);
+  
   
   // ミサイルグループの作成
-  this.createMissileGroup();
+  
   
   // 爆弾グループの作成
-  this.createBombGroup();
+  
   
   // タイマー処理で1秒ごとに爆弾の作成
-  this.timeEvent = this.time.addEvent({
-    delay: 1000,
-    callback: this.createBomb,
-    loop: true,
-    callbackScope: this
-  });  
+  
+  
+  
+  
 };
 
 mainScene.update = function() {
@@ -93,40 +89,37 @@ mainScene.createCannon = function() {
 
 mainScene.createMissileGroup = function() {
   // ミサイルグループを作成する
-  this.missleGroup = this.physics.add.group();
+  
+  
+  
 };
 
 mainScene.createMissile = function() {
   // キャノンが発射するミサイルを作成する
-  var x = this.cannon.body.center.x;
-  var y = this.cannon.body.center.y;
   
-  var missile = this.missleGroup.create(x, y, 'missile');
-  missile.setDisplaySize(100, 100);
-  var speed = 700;
-  missile.setVelocityY(-speed);
-  missile.body.setAllowGravity(false);
+  
+  
 };
 
 mainScene.createBombGroup = function() {
   // 爆弾グループを作成する
-  this.bombGroup = this.physics.add.group();
-  this.physics.add.overlap(this.bombGroup, this.missleGroup, this.hitBomb, null, this);
+  
+  
+  
 };
 
 mainScene.createBomb = function() {
   // タイマー処理で実行する爆弾を作成する
-  var x = Phaser.Math.RND.between(50, 750);
-  var y = 0;
   
-  var bomb = this.bombGroup.create(x, y,'bomb');
-  bomb.setDisplaySize(70,70);
+  
+  
 };
 
 mainScene.hitBomb = function(bomb, missile) {
   // 爆弾とミサイルが衝突したときの処理
-  bomb.destroy();
-  missile.destroy();
+  
+  
+  
 };
 
 var config = {
