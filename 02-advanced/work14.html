@@ -18,10 +18,10 @@ mainScene.preload = function() {
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
   // ボール画像の読み込み
   this.load.image('ball', 'assets/images/ball.png');
-  // 敵画像の読み込み
-  this.load.image('enemy', 'assets/images/enemy07.png');
-  // 敵ソード画像の読み込み
-  this.load.image('sword', 'assets/images/sword.png');
+  
+  
+  
+  
 };
 
 mainScene.create = function() {
@@ -70,10 +70,10 @@ mainScene.create = function() {
     this.createBall();
   }, this);
   
-  // ゲームオーバーを表す変数。初期値は「false」
-  this.isGameOver = false;
-  // 敵の作成
-  this.createEnemy();
+  
+  
+  
+  
 };
 
 mainScene.update = function() {
@@ -112,14 +112,10 @@ mainScene.update = function() {
     this.player.setVelocityY(-jumpPower);
   }
   
-  // 敵の左右移動
-  if( this.enemy.x > 700 ) {
-    this.enemy.dx = -this.enemy.dx;
-  }
-  if( this.enemy.x < 500 ) {
-    this.enemy.dx = -this.enemy.dx;
-  }
-  this.enemy.x += this.enemy.dx;
+  
+  
+  
+  
 };
 
 mainScene.createBallGroup = function() {
@@ -154,44 +150,10 @@ mainScene.createBall = function() {
 
 mainScene.createEnemy = function() {
   // 敵の作成
-  this.enemy = this.physics.add.image(700, 350, 'enemy');
-  // 敵の衝突サイズ変更
-  this.enemy.body.setSize(400,400);
-  // 敵の表示サイズ変更
-  this.enemy.setDisplaySize(200, 200);
   
-  // 敵のHPの初期設定
-  this.enemy.hp = 10;
-  // 敵の移動量を表す変数
-  this.enemy.dx = -1;
   
-  // 敵ソードグループの作成
-  this.enemySwordGroup = this.physics.add.group();
   
-  // タイマー処理で2秒ごとに敵ソードを作成
-  this.timeEvent = this.time.addEvent({
-    delay : 2000,
-    callback : this.createEnemySword,
-    loop : true,
-    callbackScope : this
-  });
   
-  // タイマー処理で3秒ごとに敵がジャンプする
-  this.enemyJumpEvent = this.time.addEvent({
-    delay : 3000,
-    callback : this.enemyJump,
-    loop : true,
-    callbackScope : this,
-  });
-
-  // 敵と地面の衝突
-  this.physics.add.collider(this.enemy, this.ground);
-  // 敵とボールグループの衝突
-  this.physics.add.overlap(this.enemy, this.ballGroup, this.hitBall, null, this);
-  // プレイヤーと敵の衝突
-  this.physics.add.overlap(this.player, this.enemy, this.hitEnemy, null, this);
-  // プレイヤーと敵ソードグループの衝突
-  this.physics.add.overlap(this.player, this.enemySwordGroup, this.hitEnemySword, null, this);
 };
 
 mainScene.createEnemySword = function() {
@@ -216,10 +178,10 @@ mainScene.createEnemySword = function() {
 
 mainScene.enemyJump = function() {
   // 敵が地面に着地しているなら
-  if( this.enemy.body.touching.down ) {
-    // Y方向に加速で、ジャンプ
-    this.enemy.setVelocityY(-400);
-  }
+  
+  
+  
+  
 };
 
 mainScene.hitEnemy = function(player, enemy) {

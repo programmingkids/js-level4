@@ -18,10 +18,11 @@ mainScene.preload = function() {
   this.load.spritesheet('player', 'assets/images/player1.png', { frameWidth: 32, frameHeight: 32 });
   // ボール画像の読み込み
   this.load.image('ball', 'assets/images/ball.png');
-  // 敵画像の読み込み
-  this.load.image('enemy', 'assets/images/enemy11.png');
-  // 敵ファイヤー画像の読み込み
-  this.load.image('fire', 'assets/images/fire.png');
+  
+  
+  
+  
+  
 };
 
 mainScene.create = function() {
@@ -70,17 +71,18 @@ mainScene.create = function() {
     this.createBall();
   }, this);
   
-  // ゲームオーバーを表す変数。初期値は「false」
-  this.isGameOver = false;
-  // 敵の作成
-  this.createEnemy();
+  
+  
+  
+  
 };
 
 mainScene.update = function() {
   // ゲームオーバーなら「update」を実行しない
-  if( this.isGameOver ) {
-    return false;
-  }
+  
+  
+  
+  
   
   var runSpeed = 200;
   var jumpPower = 350;
@@ -111,7 +113,6 @@ mainScene.update = function() {
     // ジャンプ
     this.player.setVelocityY(-jumpPower);
   }
-  
 };
 
 mainScene.createBallGroup = function() {
@@ -146,115 +147,54 @@ mainScene.createBall = function() {
 
 mainScene.createEnemy = function() {
   // 敵の作成
-  this.enemy = this.physics.add.image(700, 500, 'enemy');
-  // 敵の衝突サイズ変更
-  this.enemy.body.setSize(200,200);
-  // 敵の表示サイズ変更
-  this.enemy.setDisplaySize(200, 200);
   
-  // 敵のHPの初期設定
-  this.enemy.hp = 10;
   
-  // 敵ファイヤーグループ作成
-  this.enemyFireGroup = this.physics.add.group();
   
-  // タイマー処理で2秒ごとに、敵ファイヤーを作成
-  this.timeEvent = this.time.addEvent({
-    delay : 2000,
-    callback : this.createEnemyFire,
-    loop : true,
-    callbackScope : this
-  });  
   
-  // 敵と地面の衝突
-  this.physics.add.collider(this.enemy, this.ground);
-  // 敵とボールグループの衝突
-  this.physics.add.overlap(this.enemy, this.ballGroup, this.hitBall, null, this);
-  // プレイヤーと敵の衝突
-  this.physics.add.overlap(this.player, this.enemy, this.hitEnemy, null, this);
-  // プレイヤーと敵ファイヤーグループの衝突
-  this.physics.add.overlap(this.player, this.enemyFireGroup, this.hitEnemyFire, null, this);
 };
 
 mainScene.createEnemyFire = function() {
-  // 敵ファイヤのX座標とY座標
-  var x = this.enemy.body.center.x;
-  var y = this.enemy.body.center.y;
   
-  // 敵ファイヤーの作成
-  var fire = this.enemyFireGroup.create(x, y, 'fire');
-  // 敵ファイヤーを横向きに回転
-  fire.setAngle(90);
-  // 敵ファイヤーの衝突サイズ変更
-  fire.body.setSize(20, 20);
-  // 敵ファイヤーの表示サイズ変更
-  fire.setDisplaySize(80,80);
-  // 敵ファイヤーは重力の影響を受けない
-  fire.body.setAllowGravity(false);
   
-  // 敵ファイヤーの速度をランダムにするための配列
-  var fireSpeeds = [-300, -200, -100];
-  // 敵ファイヤーの速度をランダムにする
-  var speed = Phaser.Math.RND.pick(fireSpeeds);
-  // 敵ファイヤーにランダムな左向きの加速を加える  
-  fire.setVelocityX(speed);
+  
+  
 };
 
 mainScene.hitEnemy = function(player, enemy) {
   // プレイヤーと敵が衝突したのでゲームオーバー
-  this.gameOver();
+  
 };
 
 mainScene.hitEnemyFire = function(player, enemyFire) {
   // プレイヤーと敵ファイヤーが衝突したのでゲームオーバー
-  this.gameOver();
+  
 };
 
 mainScene.hitBall = function( enemy, ball) {
-  // ボールと敵が衝突したので、ボールを削除
-  ball.destroy();
-  // 敵のHPが減少
-  this.enemy.hp--;
   
-  // 敵のHPが「0」以下なら
-  if( this.enemy.hp <= 0 ) {
-    // ゲームクリア
-    this.gameClear();
-  }
+  
+  
+  
 };
 
 
 mainScene.gameOver = function() {
-  // ゲームオーバーにして、updateの動作停止
-  this.isGameOver = true;
-  // 物理エンジン停止
-  this.physics.pause();
-  // プレイヤーを赤色にする
-  this.player.setTint(0xff0000);
-  // プレイヤーのアニメーション停止
-  this.player.anims.stop();
-  // 敵ファイヤグループのタイマー停止
-  this.timeEvent.remove();
+  
+  
+  
+  
 };
 
 mainScene.gameClear = function() {
-  // 敵を赤色にする
-  this.enemy.setTint(0xA52A2A);
-  // 敵ファイヤーを作成するタイマーの停止
-  this.timeEvent.remove();
   
-  // 1秒後に敵を削除するタイマー処理
-  this.time.addEvent({
-    delay : 1000,
-    callback : this.destroyEnemy,
-    loop : false,
-    callbackScope : this,
-  });
+  
+  
+  
 };
 
 mainScene.destroyEnemy = function() {
   // 敵を削除する
-  this.enemy.destroy();
+  
 };
 
 var config = {
