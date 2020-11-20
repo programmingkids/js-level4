@@ -45,10 +45,10 @@ mainScene.create = function() {
   this.createMissileGroup();
   
   // 敵UFOの作成
-  this.createUFO();
+  
   
   // 敵爆弾グループの作成
-  this.createBombGroup();
+  
 };
 
 mainScene.update = function() {
@@ -72,13 +72,10 @@ mainScene.update = function() {
   }
   
   // 敵となるUFOが画面上部を左右に移動する
-  if( this.ufo.x > 700 ) {
-    this.ufo.dx = -this.ufo.dx;
-  }
-  if( this.ufo.x < 100 ) {
-    this.ufo.dx = -this.ufo.dx;
-  }
-  this.ufo.x += this.ufo.dx;
+  
+  
+  
+  
 };
 
 mainScene.createGround = function() {
@@ -123,73 +120,48 @@ mainScene.createMissile = function() {
 
 mainScene.createUFO = function() {
   // 敵となるUFOを作成する
-  this.ufo = this.physics.add.image(400, 50, "ufo");
   
-  // UFOの表示サイズ変更
-  this.ufo.setDisplaySize(200, 100);
-  // UFOは重量の影響を受けない
-  this.ufo.body.setAllowGravity(false);
   
-  // UFOのHP
-  this.ufo.hp = 10;
-  // UFOのX方向の移動量
-  this.ufo.dx = 2;
-  // UFOとミサイルグループの衝突
-  this.physics.add.overlap(this.ufo, this.missleGroup, this.hitUFO, null, this);
+  
+  
 };
 
 mainScene.createBombGroup = function() {
   // 爆弾グループを作成する
-  this.bombGroup = this.physics.add.group();
   
-  // キャノンと爆弾グループの衝突
-  this.physics.add.overlap(this.cannon, this.bombGroup, this.hitCannon, null, this);
-  // 爆弾グループとミサイルグループの衝突
-  this.physics.add.overlap(this.bombGroup, this.missleGroup, this.hitBomb, null, this);
   
-  // タイマー処理により、0.5秒ごとに爆弾を作成する
-  this.bombTimer = this.time.addEvent({
-    delay : 500,
-    callback : this.createBomb,
-    loop : true,
-    callbackScope : this,
-  });
+  
+  
 };
 
 mainScene.createBomb = function() {
   // UFOの位置に爆弾を作成する
-  var x = this.ufo.body.center.x;
-  var y = this.ufo.body.center.y;
-  var bomb = this.bombGroup.create(x, y,'bomb');
   
-  // 爆弾の表示サイズ変更
-  bomb.setDisplaySize(70,70);
-  // 爆弾にY方向に加速を設定
-  bomb.setVelocityY(300);
+  
+  
+  
 };
 
 mainScene.hitCannon = function(player, bomb) {
   // キャノンに爆弾が衝突したのでゲームオーバー
-  this.gameOver();
+  
+  
+  
 };
 
 mainScene.hitBomb = function(bomb, missile) {
   // 爆弾とミサイルが衝突したので両方を削除
-  bomb.destroy();
-  missile.destroy();
+  
+  
+  
 };
 
 mainScene.hitUFO = function(ufo, missile) {
   // UFOにミサイルが衝突したときの処理
   
-  // ミサイルを削除
-  missile.destroy();
-  // UFOのHPを減少させる
-  this.ufo.hp--;
-  // UFOのHPが「0」以下ならゲームクリア
-  if( this.ufo.hp <= 0 ) {
-    this.gameClear();
-  }
+  
+  
+  
 };
 
 mainScene.gameOver = function() {
