@@ -96,10 +96,9 @@ mainScene.update = function() {
 
 mainScene.createBallGroup = function() {
   // ボールグループ作成
-  
-  
-  
-  
+  this.ballGroup = this.physics.add.group();
+  // ボールグループと地面の衝突
+  this.physics.add.collider(this.ballGroup, this.ground);
 };
 
 mainScene.createBall = function() {

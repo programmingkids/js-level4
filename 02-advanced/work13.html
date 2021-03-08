@@ -147,6 +147,11 @@ mainScene.createBall = function() {
 
 mainScene.createEnemy = function() {
   // 敵の作成
+  this.enemy = this.physics.add.image(700, 500, 'enemy');
+  // 敵の衝突サイズ変更
+  this.enemy.body.setSize(200,200);
+  // 敵の表示サイズ変更
+  this.enemy.setDisplaySize(200, 200);
   
   
   
@@ -179,10 +184,16 @@ mainScene.hitBall = function( enemy, ball) {
 
 
 mainScene.gameOver = function() {
-  
-  
-  
-  
+  // ゲームオーバーにして、updateの動作停止
+  this.isGameOver = true;
+  // 物理エンジン停止
+  this.physics.pause();
+  // プレイヤーを赤色にする
+  this.player.setTint(0xff0000);
+  // プレイヤーのアニメーション停止
+  this.player.anims.stop();
+  // 敵ファイヤグループのタイマー停止
+  this.timeEvent.remove();
 };
 
 mainScene.gameClear = function() {

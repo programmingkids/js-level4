@@ -75,7 +75,14 @@ mainScene.create = function() {
   
   
   
-  
+
+
+  this.timer = this.time.addEvent({
+    delay: 2000,
+    callback: this.createEnemy,
+    loop: true,
+    callbackScope : this,
+  });
 };
 
 mainScene.update = function() {

@@ -69,6 +69,11 @@ mainScene.create = function() {
   
   
   
+  
+  
+  
+  // コイングループの作成
+  this.createCoinGroup();
 };
 
 mainScene.update = function() {
@@ -101,10 +106,13 @@ mainScene.update = function() {
 
 mainScene.createCoinGroup = function() {
   // コイングループ作成
-  
-  
-  
-  
+  this.coinGroup = this.physics.add.group();
+  // コイングループと地面の衝突
+  this.physics.add.collider(this.coinGroup, this.ground);
+  // コイングループとタイルグループの衝突
+  this.physics.add.collider(this.coinGroup, this.tileGroup);
+  // プレイヤーとコイングループの衝突
+  this.physics.add.overlap(this.player, this.coinGroup, this.hitCoin, null, this);
 };
 
 mainScene.hitTile = function(player, tile) {

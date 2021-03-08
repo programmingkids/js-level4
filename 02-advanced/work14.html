@@ -150,6 +150,23 @@ mainScene.createBall = function() {
 
 mainScene.createEnemy = function() {
   // 敵の作成
+  this.enemy = this.physics.add.image(700, 350, 'enemy');
+  // 敵の衝突サイズ変更
+  this.enemy.body.setSize(400,400);
+  // 敵の表示サイズ変更
+  this.enemy.setDisplaySize(200, 200);
+  
+  // 敵のHPの初期設定
+  this.enemy.hp = 10;
+  // 敵の移動量を表す変数
+  this.enemy.dx = -1;
+  
+  // 敵ソードグループの作成
+  this.enemySwordGroup = this.physics.add.group();
+
+
+
+
   
   
   
