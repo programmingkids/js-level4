@@ -103,7 +103,7 @@ mainScene.createCannon = function() {
 
 mainScene.createMissileGroup = function() {
   // ミサイルグループを作成する
-  this.missleGroup = this.physics.add.group();
+  this.missileGroup = this.physics.add.group();
 };
 
 mainScene.createMissile = function() {
@@ -111,7 +111,7 @@ mainScene.createMissile = function() {
   var x = this.cannon.body.center.x;
   var y = this.cannon.body.center.y;
   
-  var missile = this.missleGroup.create(x, y, 'missile');
+  var missile = this.missileGroup.create(x, y, 'missile');
   missile.setDisplaySize(100, 100);
   var speed = 700;
   missile.setVelocityY(-speed);
